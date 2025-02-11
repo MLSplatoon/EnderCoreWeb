@@ -1,4 +1,4 @@
-const phrases = ["Rápido", "Fácil", "Multi-Plataforma", "Open Source", "Ender Core"];
+const phrases = ["Rápido", "Fácil", "Multi-Plataforma", "Ender Core"];
 let phraseIndex = 0;
 let charIndex = 0;
 const typingSpeed = 80;

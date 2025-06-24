@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnderCore - Servidor de Minecraft</title>
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Minecraft&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-dark: #1b5e20;
+            --secondary: #ff5722;
+            --dark: #212121;
+            --light: #f5f5f5;
+            --accent: #ffc107;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Responsive */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    nav ul {
+        margin-top: 20px;
+        justify-content: center;
+        flex-direction: column; /* Cambiar a columna para móviles */
+    }
+
+    nav ul li {
+        margin: 10px 0; /* Espaciado vertical */
+    }
+
+    .hero h1 {
+        font-size: 2.5rem; /* Tamaño de fuente más pequeño */
+    }
+
+    .hero p {
+        font-size: 1rem; /* Tamaño de fuente más pequeño */
+        padding: 0 10px; /* Espaciado lateral */
+    }
+
+    .server-ip {
+        font-size: 1rem; /* Tamaño de fuente más pequeño */
+        padding: 8px 15px; /* Ajustar padding */
+    }
+
+    .btn {
+        font-size: 0.9rem; /* Tamaño de fuente más pequeño */
+        padding: 10px 20px; /* Ajustar padding */
+    }
+
+    .section-title {
+        font-size: 1.8rem; /* Tamaño de fuente más pequeño */
+    }
+
+    .grid {
+        grid-template-columns: 1fr; /* Una columna en móviles */
+    }
+
+    .card {
+        margin-bottom: 20px; /* Espaciado entre tarjetas */
+    }
+}
+
+
+         /* BARRA DE MANTENIMIENTO !!!!!
+        .maintenance-bar {
+            background-color: #d32f2f;
+            color: white;
+            text-align: center;
+            padding: 8px 0;
+            font-weight: bold;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 101;
+            animation: blink 2s infinite;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .maintenance-bar a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        @keyframes blink {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+
+        
+        header {
+            margin-top: 40px;
+            background-color: rgba(46, 125, 50, 0.9);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 40px;
+            z-index: 100;
+        }
+
+        
+        @media (max-width: 768px) {
+        .maintenance-bar {
+            padding: 6px 0; 
+            font-size: 0.9rem; 
+            }
+        }
+        */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f0f0;
+            color: var(--dark);
+            line-height: 1.6;
+            background-image: url('/wallpaper_minecraft_15th-anniversary_2560x1440.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: rgb(80, 0, 160);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Minecraft', sans-serif;
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 0;
+            color: white;
+        }
+
+        .hero h1 {
+            font-family: 'Minecraft', sans-serif;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            color: var(--accent);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+
+        .server-ip {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: inline-block;
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .server-ip:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .server-ip:active {
+            transform: translateY(1px);
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--secondary);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 10px 5px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--secondary);
+            color: var(--secondary);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .section {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            font-family: 'Minecraft', sans-serif;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            color: var(--accent);
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--secondary);
+            border-radius: 3px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .card {
+            background-color: rgba(33, 33, 33, 0.9);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(97, 0, 161, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body {
+            padding: 20px;
+            color: #ddd;
+        }
+
+        .changelog-item {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .changelog-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .changelog-date {
+            font-size: 0.9rem;
+            color: var(--secondary);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .changelog-date i {
+            margin-right: 8px;
+        }
+
+        .changelog-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .changelog-content {
+            font-size: 0.95rem;
+        }
+
+        .announcement-card {
+            background-color: rgba(255, 87, 34, 0.1);
+            border-left: 4px solid var(--secondary);
+        }
+
+        .announcement-card .card-header {
+            background-color: var(--secondary);
+        }
+
+        .server-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .stat-box {
+            background-color: rgba(33, 33, 33, 0.9);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .players-online {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 5px;
+            background-color: #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .player-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .social-links {
+            margin: 20px 0;
+        }
+
+        .social-links a {
+            color: white;
+            margin: 0 10px;
+            font-size: 1.5rem;
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: var(--accent);
+        }
+
+        .copyright {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        /* Animaciones */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            nav ul {
+                margin-top: 20px;
+                justify-content: center;
+            }
+
+            nav ul li {
+                margin: 0 10px;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .card {
+                margin-bottom: 20px;
+            }
+        }
+
+        /* Tooltip para la IP */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: var(--dark);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--dark) transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!--BARRA DE MANTENIMIENTO!!! <div class="maintenance-bar">
+        🚧 EN MANTENIMIENTO - <a href="#" target="_blank">Más información en nuestro Discord</a> 🚧
+    </div>-->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-cube"></i>
+                <span>EnderCore</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#home">Inicio</a></li>
+                    <li><a href="#changelogs">Changelogs</a></li>
+                    <li><a href="#announcements">Anuncios</a></li>
+                    <li><a href="#stats">Estadísticas</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section id="home" class="hero">
+        <div class="container">
+            <h1>EnderCore Network</h1>
+            <p>Un servidor hecho para la comunidad, disfruta de diferentes modos y eventos. ¡Únete a la aventura hoy mismo!</p>
+            
+            <div class="tooltip">
+                <div class="server-ip pulse" onclick="copyToClipboard()" id="server-ip">
+                    Copiar IP
+                </div>
+                <span class="tooltiptext" id="tooltip-text">Click para copiar</span>
+            </div>
+            
+            <div>
+                <a href="https://discord.gg/9QGTBFcbev" class="btn"><i class="fas fa-user-plus"></i> Unirse al Discord</a>
+                <a href="#changelogs" class="btn btn-outline"><i class="fas fa-scroll"></i> Ver Actualizaciones</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="changelogs" class="section">
+        <div class="container">
+            <h2 class="section-title">Changelogs</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-header">
+                        <span>Actualización 2.0</span>
+                        <span><i class="fas fa-cube"></i></span>
+                    </div>
+                    <div class="card-body">
+                        <div class="changelog-item">
+                            <div class="changelog-date">
+                                <i class="far fa-calendar-alt"></i> 24 Junio 2025
+                            </div>
+                            <h3 class="changelog-title">Mejoras Visuales</h3>
+                            <div class="changelog-content">
+                                <p>Hemos Actualizado algunos aspectos visuales:</p>
+                                <ul>
+                                    <li>La Scoreboard ha sido renovada</li>
+                                    <li>El Tabulador ha sido actualizado</li>
+                                    <li>Sistema de Anuncios en el chat</li>
+                                    <li>Web y discord actualizados.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="changelog-item">
+                            <div class="changelog-date">
+                                <i class="far fa-calendar-alt"></i> 22 Junio 2025
+                            </div>
+                            <h3 class="changelog-title">Ajustes de equilibrio</h3>
+                            <div class="changelog-content">
+                                <p>Ajustes importantes en el survival:</p>
+                                <ul>
+                                    <li>Los trabajos ahora solo pueden ser 3 en vez de 4 [4 >>> <strong>3</strong>]</li>
+                                    <li>AntiXray Habilitado</li>
+                                    <li>Nuevo trabajo: Talador</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span>Actualización 1.9</span>
+                        <span><i class="fas fa-cube"></i></span>
+                    </div>
+                    <div class="card-body">
+                        <div class="changelog-item">
+                            <div class="changelog-date">
+                                <i class="far fa-calendar-alt"></i> 28 Mayo 2025
+                            </div>
+                            <h3 class="changelog-title">Parches</h3>
+                            <div class="changelog-content">
+                                <p>Hemos arreglado algunos bugs:</p>
+                                <ul>
+                                    <li>Duping en el Survival A, Solucionado.</li>
+                                    <li>Error al conectarse con Cloudfare, Solucionado.</li>
+                                    <li>Error de Dimensiones en el Survival A, Solucionado.</li>
+                                    <li>Contraseña Incorrecta siendo correcta, Solucionado.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="changelog-item">
+                            <div class="changelog-date">
+                                <i class="far fa-calendar-alt"></i> 25 Mayo 2025
+                            </div>
+                                <h3 class="changelog-title">Corrección de Errores</h3>
+                            <div class="changelog-content">
+                                <p>Se han solucionado varios errores reportados por los usuarios:</p>
+                                <ul>
+                                    <li>Problemas de conexión en el Survival A, Solucionado.</li>
+                                    <li>Errores de visualización en el menú de selección, Solucionado.</li>
+                                    <li>Mejoras en la estabilidad del servidor.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="announcements" class="section">
+        <div class="container">
+            <h2 class="section-title">Anuncios</h2>
+            <div class="grid">
+                <div class="card announcement-card">
+                    <div class="card-header">
+                        <span>Evento de Verano</span>
+                        <span><i class="fas fa-bullhorn"></i></span>
+                    </div>
+                    <div class="card-body">
+                        <p>¡No te pierdas nuestro evento de verano! Habrá juegos, premios y sorpresas del 3 al 15 de julio.</p>
+                    </div>
+                </div>
+                <div class="card announcement-card">
+                    <div class="card-header">
+                        <span>Mantenimiento Programado</span>
+                        <span><i class="fas fa-tools"></i></span>
+                    </div>
+                    <div class="card-body">
+                        <p>El servidor estará en mantenimiento el 27 de junio de 2:00 PM a 4:00 PM [HORA ESPAÑA]. Agradecemos tu comprensión.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="stats" class="section">
+        <div class="container">
+            <h2 class="section-title">Estadísticas del Servidor</h2>
+            <div class="server-stats">
+                <div class="stat-box">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-value">32</div>
+                    <div class="stat-label">Top Máx. Jugadores</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-icon"><i class="fas fa-cube"></i></div>
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">Modos de Juego</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <div class="stat-value">9:00-22:00</div>
+                    <div class="stat-label">Tiempo de Actividad</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">Eventos Realizados</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="social-links">
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-discord"></i></a>
+            </div>
+            <div class="copyright">
+                &copy; 2025 EnderCore. Todos los derechos reservados. No estamos asociados con Mojang AB
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    function copyToClipboard() {
+        const tooltipText = document.getElementById('tooltip-text');
+        const textToCopy = "with-considered.gl.joinmc.link"; // Define el texto que quieres copiar aquí
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            tooltipText.textContent = '¡Texto copiado exitosamente!'; // Mensaje de éxito
+            setTimeout(() => {
+                tooltipText.textContent = 'Click para copiar'; // Texto de retorno
+            }, 2000);
+        }).catch(err => {
+            console.error('Error al copiar el texto: ', err);
+        });
+    }
+    </script>
+</body>
+</html>
+
